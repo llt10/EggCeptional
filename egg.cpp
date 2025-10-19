@@ -3,6 +3,7 @@
 #include <string> 
 #include <cctype>
 #include <stdexcept>
+#include <memory>
 
 
 class RottenEgg {
@@ -54,8 +55,45 @@ class BoiledEgg : public RegularEgg {
     }
 };
 
+class Carton {
+    private: 
+    std::vector<std::unique_ptr<RegularEgg>> eggs;
+
+    public: 
+    void addEgg(std::unique_ptr<RegularEgg> egg) {
+        if (eggs.size() < 12)
+        eggs.push_back(std::move(egg));
+        else 
+        std::cout << "Carton = full" <<std::endl;
+    }
+    void nextEgg() {
+        if (eggs.empty()) {
+            std::cout << "No more eggs left!" << std::endl; 
+        }
+        return;
+    }
+    auto egg = std::move(eggs.back());
+    eggs.pop_back();
+
+    try {
+        egg-> eatEgg();
+    } catch (const RottenEgg& e) {
+        std::cout << "Warning: " << e.what() << std::endl;
+    }
+};
 
 int main() {
+    Carton carton;
+    
+    carton.addEgg(std::make_unique<ScrambledEgg>());
+    carton.addEgg(std::make_unique<BoiledEgg>());
+    carton.addEgg(std::make_unique<RottenEgg>());
 
+    carton.eatNextEgg();  
+    carton.eatNextEgg(); 
+    carton.eatNextEgg();  
+    carton.eatNextEgg();  
+
+    return 0;
 }
 
